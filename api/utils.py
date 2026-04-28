@@ -1,5 +1,6 @@
 import bcrypt
 
+
 def check_password(password: str, hash: str):
     return bcrypt.checkpw(password.encode(), hash.encode())
 
