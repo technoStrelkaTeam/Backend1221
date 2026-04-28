@@ -1,42 +1,24 @@
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import create_engine
-from sqlmodel import SQLModel, Session
-
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
-temp_dialog_db = {}
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlmodel import SQLModel
+from config import postgres_url
+from services.session import cleanup_loop
 
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+session_engine = create_async_engine(postgres_url, echo=False)
+session_maker = async_sessionmaker(session_engine, class_=AsyncSession, expire_on_commit=False)
 
 
-def get_session():
-    with Session(engine) as session:
+async def create_db_and_tables():
+    async with session_engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+
+async def get_session():
+    async with session_maker() as session:
         yield session
 
-def add_message(username: str, message: str):
-    if username in temp_dialog_db:
-        temp_dialog_db[username].append(message)
-    else:
-        temp_dialog_db[username] = [message]
 
-def clear_history(username: str):
-    temp_dialog_db[username].clear()
-
-def get_history(username: str):
-    if username in temp_dialog_db:
-        return temp_dialog_db[username]
-    else:
-        return []
-    
-def get_all_dialog_user():
-    return temp_dialog_db.keys()
-
-
-SessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[AsyncSession, Depends(get_session)]

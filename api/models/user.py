@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlmodel import Field
 
-from api.schemas.user import UserBase
+from schemas.user import UserBase
 
 
 class User(UserBase, table=True):

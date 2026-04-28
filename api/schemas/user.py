@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sqlmodel import Field, SQLModel
-from api.models.enum import StatusOfUser
+from models.enum import StatusOfUser
 
 
 class UserBase(SQLModel): # тот же для добавления пользователей
