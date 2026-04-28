@@ -12,6 +12,7 @@ import threading
 import time
 from datetime import datetime
 from sqlmodel import Session
+from api.config import time_to_clear
 
 def do_action():
     while True:
@@ -20,7 +21,7 @@ def do_action():
                 user_data = get_user_by_email(email, session)
                 
                 if user_data and user_data.last_visit:
-                    if (datetime.now() - user_data.last_visit).total_seconds() > 60:
+                    if (datetime.now() - user_data.last_visit).total_seconds() > time_to_clear:
                         clear_history(email)
         
         time.sleep(10)
