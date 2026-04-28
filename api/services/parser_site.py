@@ -43,6 +43,8 @@ class Parser:
             okolo_otpusk = self.driver.find_element(By.CLASS_NAME, 'month_line__vacation--plan').find_element(By.CLASS_NAME, 'month_line__info-date')
             okolo_otpusk = self.driver.execute_script('return arguments[0].textContent;', okolo_otpusk)
 
+            
+
             return {
             'Остаток отпуска': otpusk_ostatok,
             'Остаток отгулов': days_off,
