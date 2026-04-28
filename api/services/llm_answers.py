@@ -1,12 +1,21 @@
 from ollama import Client
 from api.config import AI_MODEL
+import selenium
+import json
 
 class LLMAnswers:
     def __init__(self):
         self.client = Client()
         self.model = AI_MODEL
 
-    def answer(self, question: str, role_user: str, history: list[str]):
+    #def get_site(username, password):
+     #   driver = webdriver.Chrome()
+#
+ #       driver.get('https://selenium.dev/documentation')
+#
+ #       driver.quit()
+
+    def answer(self, question: str, role_user: str, history: list[str], password: str):
         text_role = ""
         if role_user == "new_user":
             text_role = "С тобой общается новый сотрудник, который ещё только-только адаптируется, и ему нужна базовая информация о компании, реквизитах, графику работы"
@@ -24,7 +33,14 @@ class LLMAnswers:
             add_msm += message
             history += "\n" + add_msm
 
-        system_prompt = "Ты AI-помощница под именем Техна, которая помогает сотрудникам получать мгновенные и достоверные ответы на вопросы, связанные с HR-процессами и внутренними нормативами компании. \n" + text_role + "\n Если что-то не понятно, то говори 'Вызываю оператора''. Отвечай простым текстом БЕЗ приписки TECHNA:"
+        with open("api/base_company/ПВТР.txt", "r", encoding="utf-8") as doc_file:
+            system_prompt = f'''Ты AI-помощница под именем Техна, которая помогает сотрудникам получать мгновенные и достоверные ответы на вопросы, связанные с HR-процессами и внутренними нормативами компании. \n {text_role}\n Если что-то не понятно, то говори 'Вызываю оператора' в формате обычного текста. Во всех остальных случаях отвечай ТОЛЬКО в формате JSON следующего вида
+             
+              {{
+                  "answer": "тут ты пишешь свой ответ, не говоря на основании какого документа он",
+                  "base": "тут пишешь источник откуда ты получила эти данные, например *Основание: п. 4.2 Правил внутреннего трудового распорядка*"
+              }}
+                .  \n Вот документ компании для ответов на вопросы: \n {str(doc_file)}'''
         prompt = "(на следующей строке история переписки тебя с сотрудником, а потом вопрос от него) " + history + "\n ВОПРОС: \n " + question # TODO: добавить документ
 
         try:
@@ -33,8 +49,16 @@ class LLMAnswers:
                 messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}],
                 options={"temperature": 0.25, "num_predict": 512}
             )
-            return resp["message"]["content"]
-
+            ans = resp["message"]["content"]
+            if 'вызываю оператора' in ans.lower():
+                return {
+                    "answer": 'Вызываю оператора',
+                    "base": 'В базе данных не найдена нужная информация',
+                }
+            else:
+                start = ans.find("{")
+                end = ans.rfind("}") + 1
+                return json.loads(ans[start:end].replace("\n", ""))
         except:
             return "Произошла ошибка на сервере, попробуйте ещё раз"
         

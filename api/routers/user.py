@@ -81,7 +81,7 @@ async def add_user(user_data: UserRegister, session: SessionDep):
 async def answer(session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)], message: str | None = None, ):
     user = get_user(credentials, session)
     if user:
-        response_from_ai = llm.answer(message, user.role, get_history(user.email))
+        response_from_ai = llm.answer(message, user.role, get_history(user.email), credentials.password)
         add_message(user.email, message)
         add_message(user.email, response_from_ai)
 
