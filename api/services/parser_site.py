@@ -16,7 +16,7 @@ class Parser:
         button.click()
 
     def get_my_data(self, user, password):
-        try:
+        #try:
             self.auth_user(user, password)
             self.driver.get("https://portal-test.1221systems.ru/account/")
             sleep(1)
@@ -35,13 +35,16 @@ class Parser:
             email = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/div[1]/div[1]/div/div/div[2]/div[2]/div[2]/span').text
             cadr_reserve = self.driver.find_element(By.XPATH, '//*[@id="tab-my-profile"]/div[1]/div[2]/div/div/span[2]').text
 
-            self.driver.get("https://portal-test.1221systems.ru/account/vacation/")
-            sleep(1)
-            self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[1]').click()
-            self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[2]/div[2]').find_element(By.XPATH, f"//div[text()='{fio}']").click()
-            self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[2]/div[3]/button').click()
-            okolo_otpusk = self.driver.find_element(By.CLASS_NAME, 'month_line__vacation--plan').find_element(By.CLASS_NAME, 'month_line__info-date')
-            okolo_otpusk = self.driver.execute_script('return arguments[0].textContent;', okolo_otpusk)
+            try:
+                self.driver.get("https://portal-test.1221systems.ru/account/vacation/")
+                sleep(1)
+                self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[1]').click()
+                self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[2]/div[2]').find_element(By.XPATH, f"//div[text()='{fio}']").click()
+                self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/main/div[2]/div[1]/form/div[2]/div/div[2]/div[3]/button').click()
+                okolo_otpusk = self.driver.find_element(By.CLASS_NAME, 'month_line__vacation--plan').find_element(By.CLASS_NAME, 'month_line__info-date')
+                okolo_otpusk = self.driver.execute_script('return arguments[0].textContent;', okolo_otpusk)
+            except:
+                okolo_otpusk = "в этом году отпуска нет"
 
             
 
@@ -59,8 +62,8 @@ class Parser:
             'Кадровый резерв': cadr_reserve,
             'Ближайший отпуск': okolo_otpusk
             }
-        except Exception as e:
-            print(e)
+        #except Exception as e:
+         #   print(e)
     
 parser_site = Parser()
 
