@@ -20,7 +20,10 @@ class Parser:
             self.auth_user(user, password)
             self.driver.get("https://portal-test.1221systems.ru/account/")
             sleep(1)
-            otpusk_ostatok = self.driver.find_element(By.XPATH, '//*[@id="tab-my-profile"]/div[2]/div/a[1]/div/span[2]').text.split()[1]
+            try:
+                otpusk_ostatok = self.driver.find_element(By.XPATH, '//*[@id="tab-my-profile"]/div[2]/div/a[1]/div/span[2]').text.split()[1]
+            except:
+                return "данные пользователя не найдены. Его аккаунта нет на сайте"
             days_off = self.driver.find_element(By.XPATH, '//*[@id="tab-my-profile"]/div[2]/div/a[2]/div/span[2]').text.split()[1]
             try:
                 blagodarochki = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/div[1]/div[2]/main/div[1]/div/div[2]/div[1]/span[2]').text
