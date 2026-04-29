@@ -19,7 +19,7 @@ services:
       - 8000:8000
 
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: 1221systems-db
     restart: unless-stopped
     environment:

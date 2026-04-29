@@ -28,7 +28,7 @@ async def import_document(file_path: str, update_existing: bool = True, use_llm_
         return {"error": f"Unsupported file format: {path.suffix}"}
     
     try:
-        chunks = reader.read(path)
+        chunks = await reader.read(path)
     except Exception as e:
         return {"error": f"Error reading file: {e}"}
     

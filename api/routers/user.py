@@ -23,12 +23,11 @@ security = HTTPBasic()
 async def get_user(credentials: HTTPBasicCredentials, session: AsyncSession):
     user = await session.get(User, credentials.username)
     if not user:
-        user = await session.execute(select(User).filter(User.email == credentials.username)).first()
+        result = await session.exec(select(User).filter(User.email == credentials.username))
+        user = result.first()
     if user:
         if check_password(credentials.password, user.password):
             return user
-        else:
-            return None
     return None
 
 
@@ -60,18 +59,6 @@ async def add_user(user_data: UserRegister, session: SessionDep):
     await session.commit()
     await session.refresh(user)
     return user
-
-<<<<<<< HEAD
-=======
-@router.post("/answer")
-async def answer(session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)], message: str | None = None, ):
-    user = get_user(credentials, session)
-    if user:
-        user.last_visit = datetime.now()
-        response_from_ai = llm.answer(user.email, message, user.role, get_history(user.email), credentials.password)
-        add_message(user.email, message)
-        add_message(user.email, response_from_ai)
->>>>>>> origin/main
 
 @router.post("/answer")
 async def answer(session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)], message: str | None = None):
